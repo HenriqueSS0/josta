@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase, Product, Category } from '../lib/supabase';
 import { Edit, Trash2, Search, Filter, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
+import AddProductModal from '../components/AddProductModal';
 
 const Products: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -9,6 +10,7 @@ const Products: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -97,6 +99,10 @@ const Products: React.FC = () => {
     }
   };
 
+  const handleProductAdded = () => {
+    fetchProducts();
+  };
+
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = categoryFilter === 'all' || product.category_id === categoryFilter;
@@ -115,8 +121,17 @@ const Products: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900">Produtos</h1>
-        <div className="text-sm text-gray-500">
-          Total: {filteredProducts.length} produtos
+        <div className="flex items-center space-x-4">
+          <div className="text-sm text-gray-500">
+            Total: {filteredProducts.length} produtos
+          </div>
+          <button
+            onClick={() => setIsAddModalOpen(true)}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Adicionar Produto</span>
+          </button>
         </div>
       </div>
 
@@ -241,6 +256,13 @@ const Products: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* Modal de Adicionar Produto */}
+      <AddProductModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onProductAdded={handleProductAdded}
+      />
     </div>
   );
 };
